@@ -19,10 +19,10 @@ class UserSettings: ObservableObject {
                 guard let data = UserDefaults(suiteName: Self.suiteName)?.data(forKey: Self.storeKey) else {
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else {
-                            print("Failed to create new settings no self")
+                            PasteLogger.logger.error("Failed to create new settings no self")
                             return
                         }
-                        print("Created new settings")
+                        PasteLogger.logger.info("Created new settings")
                         self.pasteSettings = PasteSettings()
                     }
                     return
@@ -30,18 +30,18 @@ class UserSettings: ObservableObject {
                 let decoded = try JSONDecoder().decode(PasteSettings.self, from: data)
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else {
-                        print("Failed to set decoded settings no self")
+                        PasteLogger.logger.error("Failed to set decoded settings no self")
                         return
                     }
-                    print("Loaded decoded settings")
+                    PasteLogger.logger.info("Loaded decoded settings")
                     self.pasteSettings = decoded
                 }
             }
             catch {
-                print("Error loading", error)
+                PasteLogger.logger.error("Error loading \(error.localizedDescription, privacy: .public)")
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else {
-                        print("Failed to set new settings after error no self")
+                        PasteLogger.logger.error("Failed to set new settings after error no self")
                         return
                     }
                     self.pasteSettings = PasteSettings()
@@ -55,10 +55,10 @@ class UserSettings: ObservableObject {
             do {
                 let data = try JSONEncoder().encode(self.pasteSettings)
                 UserDefaults(suiteName: Self.suiteName)?.set(data, forKey: Self.storeKey)
-                print("Saved settings")
+                PasteLogger.logger.info("Saved settings")
             }
             catch {
-                print("Failed to save:", error)
+                PasteLogger.logger.error("Failed to save: \(error.localizedDescription, privacy: .public)")
             }
         }
     }

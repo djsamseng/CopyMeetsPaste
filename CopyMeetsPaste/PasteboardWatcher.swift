@@ -26,18 +26,19 @@ class PasteboardWatcher: NSObject {
     }
     
     func startPolling() {
-        print("Starting")
+        PasteLogger.logger.info("Starting")
         self.timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(checkForPasteboardChanges), userInfo: nil, repeats: true)
     }
     
     func stopPolling() {
-        print("Stopping")
+        PasteLogger.logger.info("Stopping")
         self.timer?.invalidate()
         self.timer = nil
     }
     
     @objc func checkForPasteboardChanges() {
         if self.pasteBoard.changeCount != self.changeCount {
+            PasteLogger.logger.info("New copy content detected")
             let items = self.pasteBoard.pasteboardItems
             var replacement: String? = nil
             let removeStyling = self.pasteSettings?.removeStyling ?? false
@@ -45,6 +46,7 @@ class PasteboardWatcher: NSObject {
             if let items = items {
                 items.forEach({ item in
                     if let data = item.string(forType: .html) {
+                        PasteLogger.logger.info("Received html removeStyling: \(removeStyling, privacy: .public)")
                         if removeStyling {
                             replacement = Self.removeStyle(s: data)
                         }
@@ -58,6 +60,9 @@ class PasteboardWatcher: NSObject {
                 if removeStyling || removeTable {
                     self.pasteBoard.clearContents()
                     self.pasteBoard.setString(replacement, forType: .html)
+                }
+                else {
+                    PasteLogger.logger.info("Received replacement but settings disabled")
                 }
             }
             self.changeCount = self.pasteBoard.changeCount

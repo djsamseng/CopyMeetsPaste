@@ -45,7 +45,7 @@ struct SettingForm: View {
                         })
                     })
                     Spacer()
-                        .frame(height: 25)
+                        .frame(height: 40)
                     Section(content: {
                         Toggle(isOn: $pasteSettings.removeStyling, label: {
                             Label("Remove styling", systemImage: "textformat")
@@ -90,6 +90,8 @@ struct ContentView: View {
             if let pasteSettings = userSettings.pasteSettings {
                 SettingForm(userSettings: userSettings, pasteSettings: pasteSettings)
             }
+            Spacer()
+                .frame(height: 40)
             InstructionsView()
             Spacer()
         }

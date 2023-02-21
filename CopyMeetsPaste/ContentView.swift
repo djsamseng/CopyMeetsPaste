@@ -66,6 +66,10 @@ struct SettingForm: View {
             .padding(.horizontal)
             .onAppear(perform: {
                 self.pasteBoardWatcher.pasteSettings = self.pasteSettings
+                if self.pasteSettings.appEnabled {
+                    self.pasteBoardWatcher.startPolling()
+                }
+               
             })
         }
     }

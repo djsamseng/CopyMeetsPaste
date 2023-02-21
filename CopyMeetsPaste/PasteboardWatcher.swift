@@ -13,19 +13,18 @@ class PasteboardWatcher: NSObject {
     
     private let pasteBoard = NSPasteboard.general
     private var timer: Timer?
-    private var changeCount: Int
+    private var changeCount: Int = -1
     
     var pasteSettings: PasteSettings?
     
     private override init() {
-        self.changeCount = self.pasteBoard.changeCount
-        
         super.init()
-        
-        self.startPolling()
     }
     
     func startPolling() {
+        if self.timer != nil {
+            return
+        }
         PasteLogger.logger.info("Starting")
         self.timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(checkForPasteboardChanges), userInfo: nil, repeats: true)
     }
@@ -34,6 +33,7 @@ class PasteboardWatcher: NSObject {
         PasteLogger.logger.info("Stopping")
         self.timer?.invalidate()
         self.timer = nil
+        self.changeCount = -1
     }
     
     @objc func checkForPasteboardChanges() {

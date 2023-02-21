@@ -11,6 +11,8 @@
 		7EF0593A29A525F400687CCB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF0593929A525F400687CCB /* ContentView.swift */; };
 		7EF0593C29A525F500687CCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7EF0593B29A525F500687CCB /* Assets.xcassets */; };
 		7EF0594029A525F500687CCB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7EF0593F29A525F500687CCB /* Preview Assets.xcassets */; };
+		7EF0594729A5555F00687CCB /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF0594629A5555F00687CCB /* UserSettings.swift */; };
+		7EF0594929A5558800687CCB /* PasteboardWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF0594829A5558800687CCB /* PasteboardWatcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,8 @@
 		7EF0593B29A525F500687CCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7EF0593D29A525F500687CCB /* CopyMeetsPaste.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CopyMeetsPaste.entitlements; sourceTree = "<group>"; };
 		7EF0593F29A525F500687CCB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7EF0594629A5555F00687CCB /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		7EF0594829A5558800687CCB /* PasteboardWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardWatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +58,8 @@
 			children = (
 				7EF0593729A525F400687CCB /* CopyMeetsPasteApp.swift */,
 				7EF0593929A525F400687CCB /* ContentView.swift */,
+				7EF0594629A5555F00687CCB /* UserSettings.swift */,
+				7EF0594829A5558800687CCB /* PasteboardWatcher.swift */,
 				7EF0593B29A525F500687CCB /* Assets.xcassets */,
 				7EF0593D29A525F500687CCB /* CopyMeetsPaste.entitlements */,
 				7EF0593E29A525F500687CCB /* Preview Content */,
@@ -140,6 +146,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EF0593A29A525F400687CCB /* ContentView.swift in Sources */,
+				7EF0594929A5558800687CCB /* PasteboardWatcher.swift in Sources */,
+				7EF0594729A5555F00687CCB /* UserSettings.swift in Sources */,
 				7EF0593829A525F400687CCB /* CopyMeetsPasteApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -5,6 +5,7 @@
 //  Created by Samuel Seng on 2/21/23.
 //
 
+import Foundation
 import SwiftUI
 
 struct Header: View{
@@ -18,87 +19,10 @@ struct Header: View{
     }
 }
 
-class PasteSettings: ObservableObject {
-    @Published var appEnabled: Bool = true
-    
-    @Published var removeStyling: Bool = true
-    @Published var removeOuterTable: Bool = true
-}
 
-class PasteboardWatcher: NSObject {
-    static var instance: PasteboardWatcher = PasteboardWatcher()
-    
-    private let pasteBoard = NSPasteboard.general
-    private var timer: Timer?
-    private var changeCount: Int
-    
-    var pasteSettings: PasteSettings?
-    
-    private override init() {
-        self.changeCount = self.pasteBoard.changeCount
-        
-        super.init()
-        
-        self.startPolling()
-    }
-    
-    func startPolling() {
-        print("Starting")
-        self.timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(checkForPasteboardChanges), userInfo: nil, repeats: true)
-    }
-    
-    func stopPolling() {
-        print("Stopping")
-        self.timer?.invalidate()
-        self.timer = nil
-    }
-    
-    @objc func checkForPasteboardChanges() {
-        if self.pasteBoard.changeCount != self.changeCount {
-            let items = self.pasteBoard.pasteboardItems
-            var replacement: String? = nil
-            let removeStyling = self.pasteSettings?.removeStyling ?? false
-            let removeTable = self.pasteSettings?.removeOuterTable ?? false
-            if let items = items {
-                items.forEach({ item in
-                    if let data = item.string(forType: .html) {
-                        if removeStyling {
-                            replacement = Self.removeStyle(s: data)
-                        }
-                        else {
-                            replacement = data
-                        }
-                    }
-                })
-            }
-            if let replacement = replacement {
-                if removeStyling || removeTable {
-                    self.pasteBoard.clearContents()
-                    self.pasteBoard.setString(replacement, forType: .html)
-                }
-            }
-            self.changeCount = self.pasteBoard.changeCount
-        }
-    }
-    
-    static func removeStyle(s: String) -> String {
-        do {
-            let regex = try NSRegularExpression(pattern: "style=\"[^\"]*\"")
-            let regex2 = try NSRegularExpression(pattern: "style='[^']*'")
-            let range = NSRange(location: 0, length: s.count)
-            var out = regex.stringByReplacingMatches(in: s, range: range, withTemplate: "")
-            let range2 = NSRange(location: 0, length: out.count)
-            out = regex2.stringByReplacingMatches(in: out, range: range2, withTemplate: "")
-            return out
-        }
-        catch {
-            return s
-        }
-    }
-    
-}
 
 struct SettingForm: View {
+    var userSettings: UserSettings
     @ObservedObject var pasteSettings: PasteSettings
     var pasteBoardWatcher: PasteboardWatcher = PasteboardWatcher.instance
     var body: some View {
@@ -112,10 +36,12 @@ struct SettingForm: View {
                         .onChange(of: pasteSettings.appEnabled, perform: { newVal in
                             if newVal {
                                 self.pasteBoardWatcher.startPolling()
+                                
                             }
                             else{
                                 self.pasteBoardWatcher.stopPolling()
                             }
+                            userSettings.save()
                         })
                     })
                     Spacer()
@@ -124,8 +50,14 @@ struct SettingForm: View {
                         Toggle(isOn: $pasteSettings.removeStyling, label: {
                             Label("Remove styling", systemImage: "textformat")
                         })
+                        .onChange(of: pasteSettings.removeStyling, perform: { newVal in
+                            userSettings.save()
+                        })
                         Toggle(isOn: $pasteSettings.removeOuterTable, label: {
                             Label("Remove outer table", systemImage: "tablecells")
+                        })
+                        .onChange(of: pasteSettings.removeOuterTable, perform: { newVal in
+                            userSettings.save()
                         })
                     })
                 }
@@ -151,15 +83,21 @@ struct InstructionsView: View {
 }
 
 struct ContentView: View {
-    @StateObject private var pasteSettings = PasteSettings()
+    @StateObject private var userSettings = UserSettings()
     var body: some View {
         VStack {
             Header()
-            SettingForm(pasteSettings: pasteSettings)
+            if let pasteSettings = userSettings.pasteSettings {
+                SettingForm(userSettings: userSettings, pasteSettings: pasteSettings)
+            }
             InstructionsView()
+            Spacer()
         }
         .frame(idealWidth: 400, idealHeight: 600)
         .padding()
+        .onAppear(perform: {
+            self.userSettings.load()
+        })
     }
     
     

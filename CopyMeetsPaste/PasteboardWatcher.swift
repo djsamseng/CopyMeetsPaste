@@ -38,15 +38,14 @@ class PasteboardWatcher: NSObject {
     
     @objc func checkForPasteboardChanges() {
         if self.pasteBoard.changeCount != self.changeCount {
-            PasteLogger.logger.info("New copy content detected")
             let items = self.pasteBoard.pasteboardItems
             var replacement: String? = nil
+            var replacementStringBackup: String? = nil
             let removeStyling = self.pasteSettings?.removeStyling ?? false
             let removeTable = self.pasteSettings?.removeOuterTable ?? false
             if let items = items {
                 items.forEach({ item in
                     if let data = item.string(forType: .html) {
-                        PasteLogger.logger.info("Received html removeStyling: \(removeStyling, privacy: .public)")
                         if removeStyling {
                             replacement = Self.removeStyle(s: data)
                         }
@@ -54,17 +53,21 @@ class PasteboardWatcher: NSObject {
                             replacement = data
                         }
                     }
+                    if let data = item.string(forType: .string) {
+                        replacementStringBackup = data
+                    }
                 })
             }
             if let replacement = replacement {
                 if removeStyling || removeTable {
                     self.pasteBoard.clearContents()
                     self.pasteBoard.setString(replacement, forType: .html)
-                }
-                else {
-                    PasteLogger.logger.info("Received replacement but settings disabled")
+                    if let replacementStringBackup = replacementStringBackup {
+                        self.pasteBoard.setString(replacementStringBackup, forType: .string)
+                    }
                 }
             }
+            PasteLogger.logger.info("Copy detected replacement:\(replacement != nil, privacy: .public) replacementString:\(replacementStringBackup != nil, privacy: .public) removeStyling:\(removeStyling, privacy: .public) removeTable: \(removeTable, privacy: .public) ")
             self.changeCount = self.pasteBoard.changeCount
         }
     }

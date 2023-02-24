@@ -47,10 +47,14 @@ class PasteboardWatcher: NSObject {
                 items.forEach({ item in
                     if let data = item.string(forType: .html) {
                         if removeStyling {
-                            replacement = Self.removeStyle(s: data)
+                            replacement = Self.doRemoveStyle(s: data)
                         }
                         else {
                             replacement = data
+                        }
+                        
+                        if removeTable {
+                            replacement = Self.doRemoveTable(s: replacement!)
                         }
                     }
                     if let data = item.string(forType: .string) {
@@ -72,7 +76,7 @@ class PasteboardWatcher: NSObject {
         }
     }
     
-    static func removeStyle(s: String) -> String {
+    static func doRemoveStyle(s: String) -> String {
         do {
             let regex = try NSRegularExpression(pattern: "style=\"[^\"]*\"")
             let regex2 = try NSRegularExpression(pattern: "style='[^']*'")
@@ -83,6 +87,20 @@ class PasteboardWatcher: NSObject {
             return out
         }
         catch {
+            PasteLogger.logger.error("Failed to removeStyle: \(error.localizedDescription, privacy: .public)")
+            return s
+        }
+    }
+    
+    static func doRemoveTable(s: String) -> String {
+        do {
+            let regex = try NSRegularExpression(pattern: "(<table|<tbody|<tr|<td|</table|</tbody|</tr|</td)[^>]*>")
+            let range = NSRange(location: 0, length: s.count)
+            let out = regex.stringByReplacingMatches(in: s, range: range, withTemplate: "")
+            return out
+        }
+        catch {
+            PasteLogger.logger.error("Failed to removeMeta: \(error.localizedDescription, privacy: .public)")
             return s
         }
     }
